@@ -9,18 +9,24 @@ export default defineNuxtConfig({
   ssr: false,
   modules: ['@nuxtjs/tailwindcss'],
   vite: {
-    plugins: [
-      federation({
-        name: 'principal',
-        remotes: {
-          design_system: `${DS_URL}/assets/remoteEntry.js`,
-          havy: `${HAVY_URL}/assets/remoteEntry.js`,
-        },
-        shared: ['vue']
-      })
-    ],
     build: {
       target: 'esnext',
+    }
+  },
+  hooks: {
+    'vite:extendConfig'(config, { isClient }) {
+      if (isClient) {
+        config.plugins!.push(
+          federation({
+            name: 'principal',
+            remotes: {
+              design_system: `${DS_URL}/assets/remoteEntry.js`,
+              havy: `${HAVY_URL}/assets/remoteEntry.js`,
+            },
+            shared: ['vue']
+          })
+        )
+      }
     }
   },
   devtools: { enabled: true }

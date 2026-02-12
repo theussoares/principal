@@ -1,0 +1,7 @@
+declare module 'design_system/BaseButton'
+declare module 'design_system/BaseCard'
+declare module 'design_system/BaseInput'
+declare module 'design_system/BaseNavbar'
+declare module 'design_system/BaseBadge'
+declare module 'design_system/BaseSpinner'
+declare module 'havy/PokemonDetailCard'

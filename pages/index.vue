@@ -35,10 +35,10 @@ onMounted(() => loadPage())
               {{ filteredPokemons.length }} Pokémon • Powered by Micro-Frontends
             </p>
           </div>
-          <div class="pokedex-header__badges">
+          <!-- <div class="pokedex-header__badges">
             <span class="badge badge--ds">🎨 Design System :5001</span>
             <span class="badge badge--heavy">🏋 Heavy :5002</span>
-          </div>
+          </div> -->
         </div>
 
         <!-- Search -->

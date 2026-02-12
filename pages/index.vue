@@ -2,15 +2,47 @@
 import { defineAsyncComponent, onMounted } from "vue";
 import { TYPE_COLORS } from "~/types/pokemon";
 import { usePokedex } from "~/composables/usePokedex";
+import { useRemoteTelemetry } from "~/composables/useRemoteTelemetry";
 
-const BaseCard = defineAsyncComponent(() => import("design_system/BaseCard"));
-const BaseBadge = defineAsyncComponent(() => import("design_system/BaseBadge"));
-const BaseSpinner = defineAsyncComponent(
-  () => import("design_system/BaseSpinner"),
+const { trackedImport } = useRemoteTelemetry();
+const config = useRuntimeConfig();
+const dsVersion = config.public.dsVersion as string;
+const havyVersion = config.public.havyVersion as string;
+
+// Design System remote components — with telemetry tracking
+const BaseCard = defineAsyncComponent(() =>
+  trackedImport(
+    "design_system",
+    dsVersion,
+    "BaseCard",
+    () => import("design_system/BaseCard"),
+  ),
+);
+const BaseBadge = defineAsyncComponent(() =>
+  trackedImport(
+    "design_system",
+    dsVersion,
+    "BaseBadge",
+    () => import("design_system/BaseBadge"),
+  ),
+);
+const BaseSpinner = defineAsyncComponent(() =>
+  trackedImport(
+    "design_system",
+    dsVersion,
+    "BaseSpinner",
+    () => import("design_system/BaseSpinner"),
+  ),
 );
 
-const PokemonDetailCard = defineAsyncComponent(
-  () => import("havy/PokemonDetailCard"),
+// Heavy remote component — with telemetry tracking
+const PokemonDetailCard = defineAsyncComponent(() =>
+  trackedImport(
+    "havy",
+    havyVersion,
+    "PokemonDetailCard",
+    () => import("havy/PokemonDetailCard"),
+  ),
 );
 
 const {
@@ -117,11 +149,6 @@ onMounted(() => loadPage());
         </div>
 
         <template #fallback>
-          <!--
-            Skeleton placeholder with EXACT same height as the real grid
-            to prevent CLS when ClientOnly resolves.
-            12 cards × ~180px height in a ~5-col grid ≈ 3 rows × 200px
-          -->
           <div class="pokedex-skeleton">
             <div class="pokedex-skeleton__grid">
               <div v-for="i in 12" :key="i" class="pokedex-skeleton__card" />
@@ -234,7 +261,6 @@ onMounted(() => loadPage());
 
 .pokemon-card-wrapper {
   cursor: pointer;
-  /* No animation — animations cause CLS */
 }
 
 /* ═══ Pokemon Mini Card ═══ */
@@ -242,7 +268,6 @@ onMounted(() => loadPage());
   position: relative;
   text-align: center;
   overflow: hidden;
-  /* Fixed min-height prevents CLS from content loading */
   min-height: 170px;
 }
 
@@ -314,7 +339,7 @@ onMounted(() => loadPage());
   display: flex;
   justify-content: center;
   gap: 0.3rem;
-  min-height: 24px; /* Reserve space for badges to prevent CLS */
+  min-height: 24px;
 }
 
 /* ═══ Actions container (fixed height prevents CLS) ═══ */
@@ -376,7 +401,7 @@ onMounted(() => loadPage());
   transform: translateY(-1px);
 }
 
-/* ═══ Skeleton Placeholder (prevents CLS from ClientOnly) ═══ */
+/* ═══ Skeleton Placeholder ═══ */
 .pokedex-skeleton {
   padding: 0;
 }

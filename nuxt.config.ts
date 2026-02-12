@@ -42,14 +42,6 @@ export default defineNuxtConfig({
         // Preconnect to Google Fonts
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-        // Preload font file to eliminate CSS→WOFF2 chain
-        {
-          rel: 'preload',
-          href: 'https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50Sjla1ZL7W0Q5nw.woff2',
-          as: 'font',
-          type: 'font/woff2',
-          crossorigin: '',
-        },
         {
           rel: 'stylesheet',
           href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap',

@@ -20,8 +20,21 @@ export default defineNuxtConfig({
         { name: 'theme-color', content: '#0a0e1a' },
       ],
       link: [
+        // DNS-prefetch for external APIs (speed up PokeAPI + sprite image fetches)
+        { rel: 'dns-prefetch', href: 'https://pokeapi.co' },
+        { rel: 'dns-prefetch', href: 'https://raw.githubusercontent.com' },
+        // Preconnect to Google Fonts origins
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+        // Preload the actual font file to eliminate the CSS → WOFF2 chain
+        {
+          rel: 'preload',
+          href: 'https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50Sjla1ZL7W0Q5nw.woff2',
+          as: 'font',
+          type: 'font/woff2',
+          crossorigin: '',
+        },
+        // Load Google Fonts stylesheet (non-blocking because font is already preloaded)
         {
           rel: 'stylesheet',
           href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap',

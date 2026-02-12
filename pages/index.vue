@@ -100,23 +100,32 @@ onMounted(() => loadPage());
           </BaseCard>
         </div>
 
-        <!-- Loading -->
-        <div v-if="loading" class="pokedex-loading">
-          <BaseSpinner size="lg" />
-          <span>Catching Pokémon...</span>
-        </div>
-
-        <!-- Load More -->
-        <div v-if="!loading && hasMore" class="pokedex-more">
-          <button class="pokedex-more__btn" @click="loadPage">
-            Load More Pokémon ↓
-          </button>
+        <!--
+          Loading & Load More share a FIXED-HEIGHT container
+          to prevent CLS when toggling between states.
+        -->
+        <div class="pokedex-actions">
+          <div v-if="loading" class="pokedex-loading">
+            <BaseSpinner size="lg" />
+            <span>Catching Pokémon...</span>
+          </div>
+          <div v-else-if="hasMore" class="pokedex-more">
+            <button class="pokedex-more__btn" @click="loadPage">
+              Load More Pokémon ↓
+            </button>
+          </div>
         </div>
 
         <template #fallback>
-          <div class="pokedex-loading">
-            <div class="fallback-spinner" />
-            <span>Connecting to Design System remote...</span>
+          <!--
+            Skeleton placeholder with EXACT same height as the real grid
+            to prevent CLS when ClientOnly resolves.
+            12 cards × ~180px height in a ~5-col grid ≈ 3 rows × 200px
+          -->
+          <div class="pokedex-skeleton">
+            <div class="pokedex-skeleton__grid">
+              <div v-for="i in 12" :key="i" class="pokedex-skeleton__card" />
+            </div>
           </div>
         </template>
       </ClientOnly>
@@ -225,14 +234,7 @@ onMounted(() => loadPage());
 
 .pokemon-card-wrapper {
   cursor: pointer;
-  animation: cardIn 0.3s ease-out backwards;
-}
-
-@keyframes cardIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
+  /* No animation — animations cause CLS */
 }
 
 /* ═══ Pokemon Mini Card ═══ */
@@ -240,6 +242,8 @@ onMounted(() => loadPage());
   position: relative;
   text-align: center;
   overflow: hidden;
+  /* Fixed min-height prevents CLS from content loading */
+  min-height: 170px;
 }
 
 .pokemon-mini__glow {
@@ -289,7 +293,6 @@ onMounted(() => loadPage());
   height: 100%;
   object-fit: contain;
   filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
-  /* Crisp rendering for pixel-art sprites */
   image-rendering: pixelated;
 }
 
@@ -311,6 +314,15 @@ onMounted(() => loadPage());
   display: flex;
   justify-content: center;
   gap: 0.3rem;
+  min-height: 24px; /* Reserve space for badges to prevent CLS */
+}
+
+/* ═══ Actions container (fixed height prevents CLS) ═══ */
+.pokedex-actions {
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ═══ Loading ═══ */
@@ -319,7 +331,7 @@ onMounted(() => loadPage());
   flex-direction: column;
   align-items: center;
   gap: 1rem;
-  padding: 3rem;
+  padding: 1rem;
   color: #64748b;
   font-size: 0.85rem;
 }
@@ -343,7 +355,6 @@ onMounted(() => loadPage());
 .pokedex-more {
   display: flex;
   justify-content: center;
-  padding: 2rem;
 }
 
 .pokedex-more__btn {
@@ -363,5 +374,34 @@ onMounted(() => loadPage());
   background: rgba(99, 102, 241, 0.2);
   border-color: rgba(99, 102, 241, 0.4);
   transform: translateY(-1px);
+}
+
+/* ═══ Skeleton Placeholder (prevents CLS from ClientOnly) ═══ */
+.pokedex-skeleton {
+  padding: 0;
+}
+
+.pokedex-skeleton__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.pokedex-skeleton__card {
+  height: 200px;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 </style>

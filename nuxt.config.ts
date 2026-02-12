@@ -16,11 +16,7 @@ export default defineNuxtConfig({
           design_system: `${DS_URL}/assets/remoteEntry.js`,
           havy: `${HAVY_URL}/assets/remoteEntry.js`,
         },
-        shared: {
-          vue: {
-            generate: false,
-          }
-        }
+        shared: ['vue']
       })
     ],
     build: {

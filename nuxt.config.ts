@@ -10,6 +10,9 @@ const HAVY_URL = process.env.NUXT_PUBLIC_HAVY_URL || 'http://localhost:5002'
 const DS_VERSION = process.env.NUXT_PUBLIC_DS_VERSION || 'latest'
 const HAVY_VERSION = process.env.NUXT_PUBLIC_HAVY_VERSION || 'latest'
 
+// Helper: 'latest' → '/latest', '1.0.0' → '/v1.0.0'
+const versionPath = (v: string) => v === 'latest' ? 'latest' : `v${v}`
+
 export default defineNuxtConfig({
   ssr: false,
   modules: ['@nuxtjs/tailwindcss'],
@@ -69,10 +72,10 @@ export default defineNuxtConfig({
           federation({
             name: 'principal',
             remotes: {
-              // Versioned URLs: /v{version}/assets/remoteEntry.js
+              // Versioned URLs: /v1.0.0/assets/remoteEntry.js or /latest/assets/remoteEntry.js
               // 'latest' routes through Vercel rewrite to current version
-              design_system: `${DS_URL}/v${DS_VERSION}/assets/remoteEntry.js`,
-              havy: `${HAVY_URL}/v${HAVY_VERSION}/assets/remoteEntry.js`,
+              design_system: `${DS_URL}/${versionPath(DS_VERSION)}/assets/remoteEntry.js`,
+              havy: `${HAVY_URL}/${versionPath(HAVY_VERSION)}/assets/remoteEntry.js`,
             },
             shared: ['vue'],
           })

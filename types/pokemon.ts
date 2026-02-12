@@ -2,6 +2,7 @@ export interface PokemonBasic {
     id: number
     name: string
     image: string
+    artworkImage: string
     types: string[]
 }
 

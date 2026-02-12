@@ -1,21 +1,30 @@
 import { ref, computed } from 'vue'
 import type { PokemonBasic } from '~/types/pokemon'
-import { TYPE_COLORS } from '~/types/pokemon'
 
 const POKEAPI = 'https://pokeapi.co/api/v2'
+
+// In-memory cache to avoid re-fetching when navigating back
+const cachedPokemons = ref<PokemonBasic[]>([])
+const cachedPage = ref(0)
+const cachedHasMore = ref(true)
 
 /**
  * Lightweight composable: fetches only list data (name, image, types).
  * Detail fetching is delegated to the Heavy remote component.
+ *
+ * Optimizations:
+ * - Uses sprites (front_default ~5KB) instead of official-artwork (~100KB)
+ * - Reduced initial batch from 24 to 12 for faster first paint
+ * - In-memory cache prevents refetch on navigation
  */
 export function usePokedex() {
-    const pokemons = ref<PokemonBasic[]>([])
+    const pokemons = cachedPokemons
     const loading = ref(false)
     const searchQuery = ref('')
     const selectedPokemonId = ref<number | null>(null)
-    const page = ref(0)
-    const hasMore = ref(true)
-    const PAGE_SIZE = 24
+    const page = cachedPage
+    const hasMore = cachedHasMore
+    const PAGE_SIZE = 12
 
     const filteredPokemons = computed(() => {
         if (!searchQuery.value) return pokemons.value
@@ -43,7 +52,10 @@ export function usePokedex() {
                     return {
                         id: d.id,
                         name: d.name,
-                        image: d.sprites.other?.['official-artwork']?.front_default ?? d.sprites.front_default,
+                        // Use sprite (~5KB) for grid cards instead of official-artwork (~100KB)
+                        image: d.sprites.front_default,
+                        // Keep official-artwork URL for detail card preloading
+                        artworkImage: d.sprites.other?.['official-artwork']?.front_default ?? d.sprites.front_default,
                         types: d.types.map((t: any) => t.type.name),
                     } as PokemonBasic
                 })

@@ -8,11 +8,40 @@ const HAVY_URL = process.env.NUXT_PUBLIC_HAVY_URL || 'http://localhost:5002'
 export default defineNuxtConfig({
   ssr: false,
   modules: ['@nuxtjs/tailwindcss'],
+
+  app: {
+    head: {
+      htmlAttrs: { lang: 'pt-BR' },
+      charset: 'utf-8',
+      viewport: 'width=device-width, initial-scale=1',
+      title: 'Pokédex — Micro-Frontends POC',
+      meta: [
+        { name: 'description', content: 'A Pokédex built with Micro-Frontends architecture using Nuxt 4, Vue 3, and Module Federation.' },
+        { name: 'theme-color', content: '#0a0e1a' },
+      ],
+      link: [
+        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
+        {
+          rel: 'stylesheet',
+          href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap',
+        },
+      ],
+    },
+  },
+
+  routeRules: {
+    '/_nuxt/**': {
+      headers: { 'Cache-Control': 'public, max-age=31536000, immutable' },
+    },
+  },
+
   vite: {
     build: {
       target: 'esnext',
-    }
+    },
   },
+
   hooks: {
     'vite:extendConfig'(config, { isClient }) {
       if (isClient) {
@@ -23,11 +52,12 @@ export default defineNuxtConfig({
               design_system: `${DS_URL}/assets/remoteEntry.js`,
               havy: `${HAVY_URL}/assets/remoteEntry.js`,
             },
-            shared: ['vue']
+            shared: ['vue'],
           })
         )
       }
-    }
+    },
   },
-  devtools: { enabled: true }
+
+  devtools: { enabled: true },
 })

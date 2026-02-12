@@ -1,13 +1,17 @@
 <script setup lang="ts">
-import { defineAsyncComponent, onMounted } from 'vue'
-import { TYPE_COLORS } from '~/types/pokemon'
-import { usePokedex } from '~/composables/usePokedex'
+import { defineAsyncComponent, onMounted } from "vue";
+import { TYPE_COLORS } from "~/types/pokemon";
+import { usePokedex } from "~/composables/usePokedex";
 
-const BaseCard = defineAsyncComponent(() => import('design_system/BaseCard'))
-const BaseBadge = defineAsyncComponent(() => import('design_system/BaseBadge'))
-const BaseSpinner = defineAsyncComponent(() => import('design_system/BaseSpinner'))
+const BaseCard = defineAsyncComponent(() => import("design_system/BaseCard"));
+const BaseBadge = defineAsyncComponent(() => import("design_system/BaseBadge"));
+const BaseSpinner = defineAsyncComponent(
+  () => import("design_system/BaseSpinner"),
+);
 
-const PokemonDetailCard = defineAsyncComponent(() => import('havy/PokemonDetailCard'))
+const PokemonDetailCard = defineAsyncComponent(
+  () => import("havy/PokemonDetailCard"),
+);
 
 const {
   filteredPokemons,
@@ -18,9 +22,9 @@ const {
   loadPage,
   openDetail,
   closeDetail,
-} = usePokedex()
+} = usePokedex();
 
-onMounted(() => loadPage())
+onMounted(() => loadPage());
 </script>
 
 <template>
@@ -35,10 +39,6 @@ onMounted(() => loadPage())
               {{ filteredPokemons.length }} Pokémon • Powered by Micro-Frontends
             </p>
           </div>
-          <!-- <div class="pokedex-header__badges">
-            <span class="badge badge--ds">🎨 Design System :5001</span>
-            <span class="badge badge--heavy">🏋 Heavy :5002</span>
-          </div> -->
         </div>
 
         <!-- Search -->
@@ -58,7 +58,7 @@ onMounted(() => loadPage())
       <ClientOnly>
         <div class="pokedex-grid__items">
           <BaseCard
-            v-for="pokemon in filteredPokemons"
+            v-for="(pokemon, idx) in filteredPokemons"
             :key="pokemon.id"
             hoverable
             class="pokemon-card-wrapper"
@@ -66,16 +66,25 @@ onMounted(() => loadPage())
           >
             <div
               class="pokemon-mini"
-              :style="{ '--type-color': TYPE_COLORS[pokemon.types[0] ?? ''] ?? '#A8A878' }"
+              :style="{
+                '--type-color':
+                  TYPE_COLORS[pokemon.types[0] ?? ''] ?? '#A8A878',
+              }"
             >
               <div class="pokemon-mini__glow" />
-              <span class="pokemon-mini__id">#{{ String(pokemon.id).padStart(3, '0') }}</span>
+              <span class="pokemon-mini__id"
+                >#{{ String(pokemon.id).padStart(3, "0") }}</span
+              >
               <div class="pokemon-mini__img-wrap">
                 <img
                   :src="pokemon.image"
                   :alt="pokemon.name"
                   class="pokemon-mini__img"
-                  loading="lazy"
+                  width="96"
+                  height="96"
+                  decoding="async"
+                  :loading="idx < 4 ? 'eager' : 'lazy'"
+                  :fetchpriority="idx === 0 ? 'high' : undefined"
                 />
               </div>
               <h3 class="pokemon-mini__name">{{ pokemon.name }}</h3>
@@ -115,10 +124,7 @@ onMounted(() => loadPage())
 
     <!-- Detail Card (HEAVY REMOTE) -->
     <ClientOnly v-if="selectedPokemonId">
-      <PokemonDetailCard
-        :pokemon-id="selectedPokemonId"
-        @close="closeDetail"
-      />
+      <PokemonDetailCard :pokemon-id="selectedPokemonId" @close="closeDetail" />
     </ClientOnly>
   </div>
 </template>
@@ -166,33 +172,6 @@ onMounted(() => loadPage())
   margin: 0.3rem 0 0;
 }
 
-.pokedex-header__badges {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.badge {
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  padding: 0.35rem 0.85rem;
-  border-radius: 9999px;
-  border: 1px solid;
-}
-
-.badge--ds {
-  background: rgba(34, 197, 94, 0.1);
-  border-color: rgba(34, 197, 94, 0.25);
-  color: #86efac;
-}
-
-.badge--heavy {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.25);
-  color: #fca5a5;
-}
-
 /* ═══ Search ═══ */
 .pokedex-search {
   position: relative;
@@ -227,7 +206,9 @@ onMounted(() => loadPage())
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
 
-.pokedex-search__input::placeholder { color: #475569; }
+.pokedex-search__input::placeholder {
+  color: #475569;
+}
 
 /* ═══ Grid ═══ */
 .pokedex-grid {
@@ -244,24 +225,14 @@ onMounted(() => loadPage())
 
 .pokemon-card-wrapper {
   cursor: pointer;
-  animation: cardIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation: cardIn 0.3s ease-out backwards;
 }
 
-.pokemon-card-wrapper:nth-child(1)  { animation-delay: 0.02s; }
-.pokemon-card-wrapper:nth-child(2)  { animation-delay: 0.04s; }
-.pokemon-card-wrapper:nth-child(3)  { animation-delay: 0.06s; }
-.pokemon-card-wrapper:nth-child(4)  { animation-delay: 0.08s; }
-.pokemon-card-wrapper:nth-child(5)  { animation-delay: 0.10s; }
-.pokemon-card-wrapper:nth-child(6)  { animation-delay: 0.12s; }
-.pokemon-card-wrapper:nth-child(7)  { animation-delay: 0.14s; }
-.pokemon-card-wrapper:nth-child(8)  { animation-delay: 0.16s; }
-.pokemon-card-wrapper:nth-child(9)  { animation-delay: 0.18s; }
-.pokemon-card-wrapper:nth-child(10) { animation-delay: 0.20s; }
-.pokemon-card-wrapper:nth-child(11) { animation-delay: 0.22s; }
-.pokemon-card-wrapper:nth-child(12) { animation-delay: 0.24s; }
-
 @keyframes cardIn {
-  from { opacity: 0; transform: translateY(16px) scale(0.96); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
 }
 
 /* ═══ Pokemon Mini Card ═══ */
@@ -277,7 +248,11 @@ onMounted(() => loadPage())
   left: -40%;
   width: 180%;
   height: 180%;
-  background: radial-gradient(circle at 50% 80%, var(--type-color) 0%, transparent 55%);
+  background: radial-gradient(
+    circle at 50% 80%,
+    var(--type-color) 0%,
+    transparent 55%
+  );
   opacity: 0;
   transition: opacity 0.35s ease;
   pointer-events: none;
@@ -294,12 +269,13 @@ onMounted(() => loadPage())
   font-size: 0.65rem;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.1);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: "JetBrains Mono", monospace;
 }
 
 .pokemon-mini__img-wrap {
-  width: 90px;
-  height: 90px;
+  width: 96px;
+  height: 96px;
+  aspect-ratio: 1;
   margin: 0 auto 0.5rem;
   transition: transform 0.3s ease;
 }
@@ -313,10 +289,14 @@ onMounted(() => loadPage())
   height: 100%;
   object-fit: contain;
   filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
+  /* Crisp rendering for pixel-art sprites */
+  image-rendering: pixelated;
 }
 
 .pokemon-card-wrapper:hover .pokemon-mini__img {
-  filter: drop-shadow(0 6px 16px color-mix(in srgb, var(--type-color) 35%, transparent));
+  filter: drop-shadow(
+    0 6px 16px color-mix(in srgb, var(--type-color) 35%, transparent)
+  );
 }
 
 .pokemon-mini__name {
@@ -353,7 +333,11 @@ onMounted(() => loadPage())
   animation: spin 0.8s linear infinite;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 /* ═══ Load More ═══ */
 .pokedex-more {

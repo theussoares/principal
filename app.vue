@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { defineAsyncComponent, computed } from 'vue'
+import { defineAsyncComponent, computed } from "vue";
 
-const BaseNavbar = defineAsyncComponent(() => import('design_system/BaseNavbar'))
+const BaseNavbar = defineAsyncComponent(
+  () => import("design_system/BaseNavbar"),
+);
 
-const route = useRoute()
+const route = useRoute();
 
 const navLinks = computed(() => [
-  { label: 'Pokédex', href: '/', active: route.path === '/' },
-])
+  { label: "Pokédex", href: "/", active: route.path === "/" },
+]);
 </script>
 
 <template>
@@ -26,8 +28,6 @@ const navLinks = computed(() => [
 </template>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
 *,
 *::before,
 *::after {
@@ -36,10 +36,12 @@ const navLinks = computed(() => [
   padding: 0;
 }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+}
 
 body {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: "Inter", system-ui, sans-serif;
   background: #0a0e1a;
   color: #e2e8f0;
   min-height: 100vh;
